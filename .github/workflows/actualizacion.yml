@@ -1,0 +1,32 @@
+name: Actualizar Monitor IMSS
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # Se ejecuta automáticamente el día 1 de cada mes a las 00:00
+  workflow_dispatch: # Te agrega un botón en GitHub para actualizarlo manualmente cuando quieras
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: pip install pandas folium requests
+
+      - name: Ejecutar script de auditoría
+        run: python imss_compras.py
+
+      - name: Guardar y publicar el nuevo HTML
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add index.html
+          git commit -m "bot: actualización automática de datos IMSS" || exit 0
+          git push
