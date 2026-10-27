@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_1b982d7be72268df900733a6c2fa1196 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <div id="export-container" style="position: absolute; top: 12px; right: 12px; z-index: 9999; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.25); font-family: sans-serif; width: 310px;">
+        <h3 style="margin:0 0 6px 0; font-size: 15px; color: #b71c1c;">📋 Auditoría de Abasto IMSS</h3>
+        <p style="font-size: 11px; color: #555; margin-bottom: 12px;">Monitoreo cívico de compras públicas, sobreprecios y desabasto.</p>
+
+        <button onclick="exportarPDF()" style="width: 100%; background: #b71c1c; color: white; border: none; padding: 9px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-bottom: 8px; font-size: 12px;">
+            📄 Descargar Reporte PDF
+        </button>
+
+        <button onclick="exportarPNG()" style="width: 100%; background: #1565c0; color: white; border: none; padding: 9px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 12px;">
+            🖼️ Exportar Infografía (PNG)
+        </button>
+    </div>
+
+    <div id="reporte-ejecutivo" style="display:none; width: 800px; padding: 30px; background: white; font-family: Arial, sans-serif; color: #222;">
+        <div style="border-bottom: 3px solid #b71c1c; padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="margin:0; color: #b71c1c; font-size: 24px;">REPORTE EJECUTIVO DE AUDITORÍA Y ABASTO IMSS</h1>
+            <p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">Monitor Cívico de Compras Públicas e Insumos Médicos | Datos Abiertos</p>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <div style="flex: 1; background: #f5f5f5; padding: 12px; border-radius: 6px; border-left: 4px solid #b71c1c;">
+                <span style="font-size: 10px; color: #666; text-transform: uppercase;">Monto Auditado</span>
+                <h3 style="margin: 4px 0 0 0; font-size: 18px;">$261,950,000.00 MXN</h3>
+            </div>
+            <div style="flex: 1; background: #f5f5f5; padding: 12px; border-radius: 6px; border-left: 4px solid #d32f2f;">
+                <span style="font-size: 10px; color: #666; text-transform: uppercase;">Sobreprecios Alerta</span>
+                <h3 style="margin: 4px 0 0 0; font-size: 18px; color: #d32f2f;">4 Contratos</h3>
+            </div>
+            <div style="flex: 1; background: #f5f5f5; padding: 12px; border-radius: 6px; border-left: 4px solid #f57c00;">
+                <span style="font-size: 10px; color: #666; text-transform: uppercase;">Faltantes Críticos</span>
+                <h3 style="margin: 4px 0 0 0; font-size: 18px; color: #f57c00;">7 Hospitales</h3>
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; margin-bottom: 8px; color: #333;">Desglose de Contratos e Inconsistencias Detectadas</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+                <tr style="background: #212121; color: white; font-size: 11px; text-align: left;">
+                    <th style="padding: 8px;">Hospital / Unidad</th>
+                    <th style="padding: 8px;">Medicamento</th>
+                    <th style="padding: 8px;">Proveedor</th>
+                    <th style="padding: 8px;">Precio Pagado</th>
+                    <th style="padding: 8px;">Prom. Mercado</th>
+                    <th style="padding: 8px;">Desvío</th>
+                    <th style="padding: 8px;">Estatus</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 89 Guadalajara</b></td>
+            <td style="padding: 6px;">Insulina Humana NPH</td>
+            <td style="padding: 6px;">FarmaDistribuidora MX</td>
+            <td style="padding: 6px;">$150.00</td>
+            <td style="padding: 6px;">$240.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>Centro Médico Nacional Occidente</b></td>
+            <td style="padding: 6px;">Insulina Humana NPH</td>
+            <td style="padding: 6px;">Suministros Médicos del Norte</td>
+            <td style="padding: 6px;">$320.00</td>
+            <td style="padding: 6px;">$240.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>UMF 51 Zapopan</b></td>
+            <td style="padding: 6px;">Insulina Humana NPH</td>
+            <td style="padding: 6px;">FarmaDistribuidora MX</td>
+            <td style="padding: 6px;">$150.00</td>
+            <td style="padding: 6px;">$240.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 Puebla</b></td>
+            <td style="padding: 6px;">Insulina Humana NPH</td>
+            <td style="padding: 6px;">PharmaSur SA</td>
+            <td style="padding: 6px;">$300.00</td>
+            <td style="padding: 6px;">$240.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>UMF 51 Zapopan</b></td>
+            <td style="padding: 6px;">Metformina 850mg</td>
+            <td style="padding: 6px;">Comercializadora Meds SA</td>
+            <td style="padding: 6px;">$15.00</td>
+            <td style="padding: 6px;">$18.50</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>UMF 34 Guadalajara</b></td>
+            <td style="padding: 6px;">Metformina 850mg</td>
+            <td style="padding: 6px;">Laboratorios Unidos</td>
+            <td style="padding: 6px;">$14.00</td>
+            <td style="padding: 6px;">$18.50</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 33 Monterrey</b></td>
+            <td style="padding: 6px;">Metformina 850mg</td>
+            <td style="padding: 6px;">ProveeSalud Norte</td>
+            <td style="padding: 6px;">$30.00</td>
+            <td style="padding: 6px;">$18.50</td>
+            <td style="padding: 6px;"><span style='color:#d32f2f; font-weight:bold;'>+ 62%</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>Centro Médico Nacional Occidente</b></td>
+            <td style="padding: 6px;">Ciclosporina 100mg</td>
+            <td style="padding: 6px;">Grupo Pharma Global</td>
+            <td style="padding: 6px;">$900.00</td>
+            <td style="padding: 6px;">$1,375.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>CMN Siglo XXI CDMX</b></td>
+            <td style="padding: 6px;">Ciclosporina 100mg</td>
+            <td style="padding: 6px;">BioTech Solutions</td>
+            <td style="padding: 6px;">$1,850.00</td>
+            <td style="padding: 6px;">$1,375.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>CMN La Raza CDMX</b></td>
+            <td style="padding: 6px;">Paclitaxel 100mg</td>
+            <td style="padding: 6px;">OncoFarma MX</td>
+            <td style="padding: 6px;">$3,000.00</td>
+            <td style="padding: 6px;">$4,500.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGR 1 Tijuana</b></td>
+            <td style="padding: 6px;">Paclitaxel 100mg</td>
+            <td style="padding: 6px;">Distribuidora Especializada</td>
+            <td style="padding: 6px;">$6,000.00</td>
+            <td style="padding: 6px;">$4,500.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 71 Veracruz</b></td>
+            <td style="padding: 6px;">Losartán 50mg</td>
+            <td style="padding: 6px;">Genéricos de México</td>
+            <td style="padding: 6px;">$10.00</td>
+            <td style="padding: 6px;">$15.67</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGR 1 Mérida</b></td>
+            <td style="padding: 6px;">Losartán 50mg</td>
+            <td style="padding: 6px;">Suministros Globales</td>
+            <td style="padding: 6px;">$25.00</td>
+            <td style="padding: 6px;">$15.67</td>
+            <td style="padding: 6px;"><span style='color:#d32f2f; font-weight:bold;'>+ 60%</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 14 Hermosillo</b></td>
+            <td style="padding: 6px;">Paracetamol 500mg</td>
+            <td style="padding: 6px;">FarmaDistribuidora MX</td>
+            <td style="padding: 6px;">$3.00</td>
+            <td style="padding: 6px;">$6.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 Tapachula</b></td>
+            <td style="padding: 6px;">Paracetamol 500mg</td>
+            <td style="padding: 6px;">Distribuidora Express</td>
+            <td style="padding: 6px;">$9.00</td>
+            <td style="padding: 6px;">$6.00</td>
+            <td style="padding: 6px;"><span style='color:#d32f2f; font-weight:bold;'>+ 50%</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 León</b></td>
+            <td style="padding: 6px;">Omeprazol 20mg</td>
+            <td style="padding: 6px;">Meds del Bajío</td>
+            <td style="padding: 6px;">$8.00</td>
+            <td style="padding: 6px;">$13.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 San Luis Potosí</b></td>
+            <td style="padding: 6px;">Omeprazol 20mg</td>
+            <td style="padding: 6px;">Pharma Potosí</td>
+            <td style="padding: 6px;">$18.00</td>
+            <td style="padding: 6px;">$13.00</td>
+            <td style="padding: 6px;"><span style='color:#d32f2f; font-weight:bold;'>+ 38%</span></td>
+            <td style="padding: 6px;"><span style="background:#f57c00; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Atrasado</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 Culiacán</b></td>
+            <td style="padding: 6px;">Losartán 50mg</td>
+            <td style="padding: 6px;">Farma Sinaloa</td>
+            <td style="padding: 6px;">$12.00</td>
+            <td style="padding: 6px;">$15.67</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 Querétaro</b></td>
+            <td style="padding: 6px;">Metformina 850mg</td>
+            <td style="padding: 6px;">Distribuidora del Centro</td>
+            <td style="padding: 6px;">$15.00</td>
+            <td style="padding: 6px;">$18.50</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#43a047; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">A tiempo</span></td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #ddd; font-size: 11px;">
+            <td style="padding: 6px;"><b>HGZ 1 Morelia</b></td>
+            <td style="padding: 6px;">Insulina Humana NPH</td>
+            <td style="padding: 6px;">Meds Michoacán</td>
+            <td style="padding: 6px;">$280.00</td>
+            <td style="padding: 6px;">$240.00</td>
+            <td style="padding: 6px;"><span style='color:#388e3c;'>Normal</span></td>
+            <td style="padding: 6px;"><span style="background:#e53935; color:white; padding:2px 6px; border-radius:3px; font-weight:bold;">Crítico / Faltante</span></td>
+        </tr>
+        
+            </tbody>
+        </table>
+
+        <div style="border-top: 1px solid #ccc; pt: 10px; font-size: 10px; color: #777; display: flex; justify-content: space-between;">
+            <span>Generado automáticamente por Monitor Cívico IMSS (OSINT & Data Analytics)</span>
+            <span>https://ilovelace-2004.github.io/monitor-imss-datos/</span>
+        </div>
+    </div>
+
+    <script>
+    function exportarPDF() {
+        const element = document.getElementById('reporte-ejecutivo');
+        element.style.display = 'block';
+        const opt = {
+          margin:       0.3,
+          filename:     'Reporte_Auditoria_IMSS_Completo.pdf',
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2 },
+          jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.display = 'none';
+        });
+    }
+
+    function exportarPNG() {
+        const element = document.getElementById('reporte-ejecutivo');
+        element.style.display = 'block';
+        html2canvas(element, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'Infografia_Auditoria_IMSS.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            element.style.display = 'none';
+        });
+    }
+    </script>
+    
+    
+    
+            <div class="folium-map" id="map_1b982d7be72268df900733a6c2fa1196" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_1b982d7be72268df900733a6c2fa1196 = L.map(
+                "map_1b982d7be72268df900733a6c2fa1196",
+                {
+                    center: [23.6345, -102.5528],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 5,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_642bb2ebbf5587b18a49962506bcbec3 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_642bb2ebbf5587b18a49962506bcbec3.addTo(map_1b982d7be72268df900733a6c2fa1196);
+        
+    
+            var heat_map_8a5fe887e81927a124dbdd5bdc1bdb93 = L.heatLayer(
+                [[20.6552, -103.3648, 1.0], [20.6865, -103.328, 2.0], [20.7225, -103.3892, 1.0], [19.043, -98.198, 2.0], [20.7225, -103.3892, 1.0], [20.672, -103.341, 1.0], [25.683, -100.308, 2.0], [20.6865, -103.328, 2.0], [19.4058, -99.1558, 2.0], [19.4695, -99.1432, 1.0], [32.514, -116.972, 2.0], [19.18, -96.16, 1.0], [20.97, -89.62, 2.0], [29.088, -110.96, 1.0], [14.908, -92.26, 2.0], [21.12, -101.68, 1.0], [22.15, -100.98, 2.0], [24.8, -107.39, 1.0], [20.59, -100.39, 1.0], [19.7, -101.19, 2.0]],
+                {
+  "minOpacity": 0.5,
+  "maxZoom": 10,
+  "radius": 28,
+  "blur": 18,
+}
+            );
+        
+    
+            heat_map_8a5fe887e81927a124dbdd5bdc1bdb93.addTo(map_1b982d7be72268df900733a6c2fa1196);
+        
+    
+            var feature_group_3ab87aba1681c36276755c03dcc6b2eb = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_3675f640a771131187c4f5a6853beb30 = L.marker(
+                [20.6552, -103.3648],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_03d0e266b64f5dd73c0fa1851629a697 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_de7c74375902084f9e6c52a607f99d6f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_288424f9e849263bc23f937806157634 = $(`<div id="html_288424f9e849263bc23f937806157634" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 89 Guadalajara</h4>             <b>Guadalajara, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Insulina Humana NPH<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> FarmaDistribuidora MX<br>             <b>Precio Unitario:</b> $150.00 MXN<br>             <b>Promedio Mercado:</b> $240.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0101         </div>         </div>`)[0];
+                popup_de7c74375902084f9e6c52a607f99d6f.setContent(html_288424f9e849263bc23f937806157634);
+            
+        
+
+        marker_3675f640a771131187c4f5a6853beb30.bindPopup(popup_de7c74375902084f9e6c52a607f99d6f)
+        ;
+
+        
+    
+    
+            marker_3675f640a771131187c4f5a6853beb30.bindTooltip(
+                `<div>
+                     HGZ 89 Guadalajara - Insulina Humana NPH
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_3675f640a771131187c4f5a6853beb30.setIcon(icon_03d0e266b64f5dd73c0fa1851629a697);
+            
+    
+            var marker_acb83f5c96386ed23f9d8867f3631749 = L.marker(
+                [20.6865, -103.328],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_3feca6109a6afdb2394f1d7e84d86739 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_bcaaf03ba065bd714a1666040f2d7747 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e745f032d2a433aec7e89138a4e4320a = $(`<div id="html_e745f032d2a433aec7e89138a4e4320a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">Centro Médico Nacional Occidente</h4>             <b>Guadalajara, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Insulina Humana NPH<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> Suministros Médicos del Norte<br>             <b>Precio Unitario:</b> $320.00 MXN<br>             <b>Promedio Mercado:</b> $240.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0102         </div>         </div>`)[0];
+                popup_bcaaf03ba065bd714a1666040f2d7747.setContent(html_e745f032d2a433aec7e89138a4e4320a);
+            
+        
+
+        marker_acb83f5c96386ed23f9d8867f3631749.bindPopup(popup_bcaaf03ba065bd714a1666040f2d7747)
+        ;
+
+        
+    
+    
+            marker_acb83f5c96386ed23f9d8867f3631749.bindTooltip(
+                `<div>
+                     Centro Médico Nacional Occidente - Insulina Humana NPH
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_acb83f5c96386ed23f9d8867f3631749.setIcon(icon_3feca6109a6afdb2394f1d7e84d86739);
+            
+    
+            var marker_56c9bb48901112f43318cb9a89a37d2c = L.marker(
+                [20.7225, -103.3892],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_2bba423d86c272dc576177606a786b90 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "clock",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_1400345182b13a5f97c55d9b4f6d5263 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b27c2d53019a2a1edfc08256e9459eda = $(`<div id="html_b27c2d53019a2a1edfc08256e9459eda" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">UMF 51 Zapopan</h4>             <b>Zapopan, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Insulina Humana NPH<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> FarmaDistribuidora MX<br>             <b>Precio Unitario:</b> $150.00 MXN<br>             <b>Promedio Mercado:</b> $240.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0103         </div>         </div>`)[0];
+                popup_1400345182b13a5f97c55d9b4f6d5263.setContent(html_b27c2d53019a2a1edfc08256e9459eda);
+            
+        
+
+        marker_56c9bb48901112f43318cb9a89a37d2c.bindPopup(popup_1400345182b13a5f97c55d9b4f6d5263)
+        ;
+
+        
+    
+    
+            marker_56c9bb48901112f43318cb9a89a37d2c.bindTooltip(
+                `<div>
+                     UMF 51 Zapopan - Insulina Humana NPH
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_56c9bb48901112f43318cb9a89a37d2c.setIcon(icon_2bba423d86c272dc576177606a786b90);
+            
+    
+            var marker_87cd817cee50299c0174d795910e283c = L.marker(
+                [19.043, -98.198],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_31c38a06f63c883f2a6de2a68297ccf8 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_014d5e1fd6fc9810ed96c0429ee3fa62 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_82d6370be2b112e448ca0dad379b3e1a = $(`<div id="html_82d6370be2b112e448ca0dad379b3e1a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 Puebla</h4>             <b>Puebla, Pue.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Insulina Humana NPH<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> PharmaSur SA<br>             <b>Precio Unitario:</b> $300.00 MXN<br>             <b>Promedio Mercado:</b> $240.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0104         </div>         </div>`)[0];
+                popup_014d5e1fd6fc9810ed96c0429ee3fa62.setContent(html_82d6370be2b112e448ca0dad379b3e1a);
+            
+        
+
+        marker_87cd817cee50299c0174d795910e283c.bindPopup(popup_014d5e1fd6fc9810ed96c0429ee3fa62)
+        ;
+
+        
+    
+    
+            marker_87cd817cee50299c0174d795910e283c.bindTooltip(
+                `<div>
+                     HGZ 1 Puebla - Insulina Humana NPH
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_87cd817cee50299c0174d795910e283c.setIcon(icon_31c38a06f63c883f2a6de2a68297ccf8);
+            
+    
+            var marker_07f73f4deab4708cc12e8cad9d638418 = L.marker(
+                [20.7225, -103.3892],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_e41abc4f344318cd7ef1c25b97ce5ab4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "clock",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f187e316ec8dc8f1c34b033be195b901 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c7b3b3244dab7765c3cecff824a861a9 = $(`<div id="html_c7b3b3244dab7765c3cecff824a861a9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">UMF 51 Zapopan</h4>             <b>Zapopan, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Metformina 850mg<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> Comercializadora Meds SA<br>             <b>Precio Unitario:</b> $15.00 MXN<br>             <b>Promedio Mercado:</b> $18.50 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0201         </div>         </div>`)[0];
+                popup_f187e316ec8dc8f1c34b033be195b901.setContent(html_c7b3b3244dab7765c3cecff824a861a9);
+            
+        
+
+        marker_07f73f4deab4708cc12e8cad9d638418.bindPopup(popup_f187e316ec8dc8f1c34b033be195b901)
+        ;
+
+        
+    
+    
+            marker_07f73f4deab4708cc12e8cad9d638418.bindTooltip(
+                `<div>
+                     UMF 51 Zapopan - Metformina 850mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_07f73f4deab4708cc12e8cad9d638418.setIcon(icon_e41abc4f344318cd7ef1c25b97ce5ab4);
+            
+    
+            var marker_f159900024685444a01e4b5b2fdf136d = L.marker(
+                [20.672, -103.341],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_86ccb3b05f1bda459853cd071d151c71 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f701954ee30bfbb02c6907be3b30203d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1a2c1ccc1351a1d17dcce2a89189f2f7 = $(`<div id="html_1a2c1ccc1351a1d17dcce2a89189f2f7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">UMF 34 Guadalajara</h4>             <b>Guadalajara, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Metformina 850mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> Laboratorios Unidos<br>             <b>Precio Unitario:</b> $14.00 MXN<br>             <b>Promedio Mercado:</b> $18.50 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0202         </div>         </div>`)[0];
+                popup_f701954ee30bfbb02c6907be3b30203d.setContent(html_1a2c1ccc1351a1d17dcce2a89189f2f7);
+            
+        
+
+        marker_f159900024685444a01e4b5b2fdf136d.bindPopup(popup_f701954ee30bfbb02c6907be3b30203d)
+        ;
+
+        
+    
+    
+            marker_f159900024685444a01e4b5b2fdf136d.bindTooltip(
+                `<div>
+                     UMF 34 Guadalajara - Metformina 850mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_f159900024685444a01e4b5b2fdf136d.setIcon(icon_86ccb3b05f1bda459853cd071d151c71);
+            
+    
+            var marker_987678b20350b987365b3006a8f259ea = L.marker(
+                [25.683, -100.308],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_4ec51c4cf1c9b9adf7d82fcb2e7ca762 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_4a8254a185ae2d2d7c948526ce5a8ba9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2d6917f8ae4e0846502d5db73ec098ac = $(`<div id="html_2d6917f8ae4e0846502d5db73ec098ac" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 33 Monterrey</h4>             <b>Monterrey, N.L.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Metformina 850mg<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> ProveeSalud Norte<br>             <b>Precio Unitario:</b> $30.00 MXN<br>             <b>Promedio Mercado:</b> $18.50 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0203         </div>         </div>`)[0];
+                popup_4a8254a185ae2d2d7c948526ce5a8ba9.setContent(html_2d6917f8ae4e0846502d5db73ec098ac);
+            
+        
+
+        marker_987678b20350b987365b3006a8f259ea.bindPopup(popup_4a8254a185ae2d2d7c948526ce5a8ba9)
+        ;
+
+        
+    
+    
+            marker_987678b20350b987365b3006a8f259ea.bindTooltip(
+                `<div>
+                     HGZ 33 Monterrey - Metformina 850mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_987678b20350b987365b3006a8f259ea.setIcon(icon_4ec51c4cf1c9b9adf7d82fcb2e7ca762);
+            
+    
+            var marker_d86771cc1b8b1c7553a11ac2a5658355 = L.marker(
+                [20.6865, -103.328],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_e44ffd663ea7f83e5e021f5f82e36555 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ad01770c236f7d8d3326cb4d4943c4f5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_abd8c75bb39d506c017334d8fcf75b53 = $(`<div id="html_abd8c75bb39d506c017334d8fcf75b53" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">Centro Médico Nacional Occidente</h4>             <b>Guadalajara, Jal.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Ciclosporina 100mg<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> Grupo Pharma Global<br>             <b>Precio Unitario:</b> $900.00 MXN<br>             <b>Promedio Mercado:</b> $1,375.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0301         </div>         </div>`)[0];
+                popup_ad01770c236f7d8d3326cb4d4943c4f5.setContent(html_abd8c75bb39d506c017334d8fcf75b53);
+            
+        
+
+        marker_d86771cc1b8b1c7553a11ac2a5658355.bindPopup(popup_ad01770c236f7d8d3326cb4d4943c4f5)
+        ;
+
+        
+    
+    
+            marker_d86771cc1b8b1c7553a11ac2a5658355.bindTooltip(
+                `<div>
+                     Centro Médico Nacional Occidente - Ciclosporina 100mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_d86771cc1b8b1c7553a11ac2a5658355.setIcon(icon_e44ffd663ea7f83e5e021f5f82e36555);
+            
+    
+            var marker_360be7a84690b3b166511bf1a3e6725a = L.marker(
+                [19.4058, -99.1558],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_8f288544d4652c41c4a7df3e0fb8391f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f59ac77ae5373690a4fb415a404b0ce2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_cc2a53bca5fad051aa9c37dcbc7012ba = $(`<div id="html_cc2a53bca5fad051aa9c37dcbc7012ba" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">CMN Siglo XXI CDMX</h4>             <b>Cuauhtémoc, CDMX</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Ciclosporina 100mg<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> BioTech Solutions<br>             <b>Precio Unitario:</b> $1,850.00 MXN<br>             <b>Promedio Mercado:</b> $1,375.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0302         </div>         </div>`)[0];
+                popup_f59ac77ae5373690a4fb415a404b0ce2.setContent(html_cc2a53bca5fad051aa9c37dcbc7012ba);
+            
+        
+
+        marker_360be7a84690b3b166511bf1a3e6725a.bindPopup(popup_f59ac77ae5373690a4fb415a404b0ce2)
+        ;
+
+        
+    
+    
+            marker_360be7a84690b3b166511bf1a3e6725a.bindTooltip(
+                `<div>
+                     CMN Siglo XXI CDMX - Ciclosporina 100mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_360be7a84690b3b166511bf1a3e6725a.setIcon(icon_8f288544d4652c41c4a7df3e0fb8391f);
+            
+    
+            var marker_44f612719e7fb063d78151350c622547 = L.marker(
+                [19.4695, -99.1432],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_f638e8b3c5c79b84c52deba93402541e = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "clock",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_85abe1f00f32ee4bb2c8dfc395ebe9ad = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_efa7f09b08e4a7ab855f5c4c410e4b87 = $(`<div id="html_efa7f09b08e4a7ab855f5c4c410e4b87" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">CMN La Raza CDMX</h4>             <b>Azcapotzalco, CDMX</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Paclitaxel 100mg<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> OncoFarma MX<br>             <b>Precio Unitario:</b> $3,000.00 MXN<br>             <b>Promedio Mercado:</b> $4,500.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0303         </div>         </div>`)[0];
+                popup_85abe1f00f32ee4bb2c8dfc395ebe9ad.setContent(html_efa7f09b08e4a7ab855f5c4c410e4b87);
+            
+        
+
+        marker_44f612719e7fb063d78151350c622547.bindPopup(popup_85abe1f00f32ee4bb2c8dfc395ebe9ad)
+        ;
+
+        
+    
+    
+            marker_44f612719e7fb063d78151350c622547.bindTooltip(
+                `<div>
+                     CMN La Raza CDMX - Paclitaxel 100mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_44f612719e7fb063d78151350c622547.setIcon(icon_f638e8b3c5c79b84c52deba93402541e);
+            
+    
+            var marker_2f16ab4faa11bd6be9a7272b6d03f11b = L.marker(
+                [32.514, -116.972],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_b83db71437b373d782acd233a5be4679 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_0054c66af2040fbf8ba7d69285a2163b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_09701bc31e850729917297aaecf8cda5 = $(`<div id="html_09701bc31e850729917297aaecf8cda5" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGR 1 Tijuana</h4>             <b>Tijuana, B.C.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Paclitaxel 100mg<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> Distribuidora Especializada<br>             <b>Precio Unitario:</b> $6,000.00 MXN<br>             <b>Promedio Mercado:</b> $4,500.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0304         </div>         </div>`)[0];
+                popup_0054c66af2040fbf8ba7d69285a2163b.setContent(html_09701bc31e850729917297aaecf8cda5);
+            
+        
+
+        marker_2f16ab4faa11bd6be9a7272b6d03f11b.bindPopup(popup_0054c66af2040fbf8ba7d69285a2163b)
+        ;
+
+        
+    
+    
+            marker_2f16ab4faa11bd6be9a7272b6d03f11b.bindTooltip(
+                `<div>
+                     HGR 1 Tijuana - Paclitaxel 100mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_2f16ab4faa11bd6be9a7272b6d03f11b.setIcon(icon_b83db71437b373d782acd233a5be4679);
+            
+    
+            var marker_e3b7b16bc34357d95b09db5bd29c8bc6 = L.marker(
+                [19.18, -96.16],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_e5ded628a18e465dfdbacf30e1905259 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ff64a56b90e47bc052afc87815241c67 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c163443dbc89c12d40ff11d9193b547a = $(`<div id="html_c163443dbc89c12d40ff11d9193b547a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 71 Veracruz</h4>             <b>Veracruz, Ver.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Losartán 50mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> Genéricos de México<br>             <b>Precio Unitario:</b> $10.00 MXN<br>             <b>Promedio Mercado:</b> $15.67 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0401         </div>         </div>`)[0];
+                popup_ff64a56b90e47bc052afc87815241c67.setContent(html_c163443dbc89c12d40ff11d9193b547a);
+            
+        
+
+        marker_e3b7b16bc34357d95b09db5bd29c8bc6.bindPopup(popup_ff64a56b90e47bc052afc87815241c67)
+        ;
+
+        
+    
+    
+            marker_e3b7b16bc34357d95b09db5bd29c8bc6.bindTooltip(
+                `<div>
+                     HGZ 71 Veracruz - Losartán 50mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_e3b7b16bc34357d95b09db5bd29c8bc6.setIcon(icon_e5ded628a18e465dfdbacf30e1905259);
+            
+    
+            var marker_6a3f885afb0d72b303423c25de2a2920 = L.marker(
+                [20.97, -89.62],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_7d4e6219c52077d29bcb710358c25f88 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_697ea6d892d172af31e5ea8d3dc54bdd = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3221c9220db2a3c5c5cd9b256d739027 = $(`<div id="html_3221c9220db2a3c5c5cd9b256d739027" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGR 1 Mérida</h4>             <b>Mérida, Yuc.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Losartán 50mg<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> Suministros Globales<br>             <b>Precio Unitario:</b> $25.00 MXN<br>             <b>Promedio Mercado:</b> $15.67 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0402         </div>         </div>`)[0];
+                popup_697ea6d892d172af31e5ea8d3dc54bdd.setContent(html_3221c9220db2a3c5c5cd9b256d739027);
+            
+        
+
+        marker_6a3f885afb0d72b303423c25de2a2920.bindPopup(popup_697ea6d892d172af31e5ea8d3dc54bdd)
+        ;
+
+        
+    
+    
+            marker_6a3f885afb0d72b303423c25de2a2920.bindTooltip(
+                `<div>
+                     HGR 1 Mérida - Losartán 50mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6a3f885afb0d72b303423c25de2a2920.setIcon(icon_7d4e6219c52077d29bcb710358c25f88);
+            
+    
+            var marker_2810d213d8c9b8ce062990a2da0661a8 = L.marker(
+                [29.088, -110.96],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_59c6a3db0fcd88e1f59c77a5bb7ca53c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_3ed9f6d708a651d301431bbd6894afc2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c507f1d62b747abd39e13b07c36f99a9 = $(`<div id="html_c507f1d62b747abd39e13b07c36f99a9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 14 Hermosillo</h4>             <b>Hermosillo, Son.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Paracetamol 500mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> FarmaDistribuidora MX<br>             <b>Precio Unitario:</b> $3.00 MXN<br>             <b>Promedio Mercado:</b> $6.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0403         </div>         </div>`)[0];
+                popup_3ed9f6d708a651d301431bbd6894afc2.setContent(html_c507f1d62b747abd39e13b07c36f99a9);
+            
+        
+
+        marker_2810d213d8c9b8ce062990a2da0661a8.bindPopup(popup_3ed9f6d708a651d301431bbd6894afc2)
+        ;
+
+        
+    
+    
+            marker_2810d213d8c9b8ce062990a2da0661a8.bindTooltip(
+                `<div>
+                     HGZ 14 Hermosillo - Paracetamol 500mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_2810d213d8c9b8ce062990a2da0661a8.setIcon(icon_59c6a3db0fcd88e1f59c77a5bb7ca53c);
+            
+    
+            var marker_65498504c23738e0c9bac659bac8bb16 = L.marker(
+                [14.908, -92.26],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_1be3a670b3aae5399e83d4ed4c6114c2 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_7a93d2e0384bd398e9eabb4827c22aa9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_98d5b485dc280c5fafee3e8cbc789159 = $(`<div id="html_98d5b485dc280c5fafee3e8cbc789159" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 Tapachula</h4>             <b>Tapachula, Chis.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Paracetamol 500mg<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> Distribuidora Express<br>             <b>Precio Unitario:</b> $9.00 MXN<br>             <b>Promedio Mercado:</b> $6.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0404         </div>         </div>`)[0];
+                popup_7a93d2e0384bd398e9eabb4827c22aa9.setContent(html_98d5b485dc280c5fafee3e8cbc789159);
+            
+        
+
+        marker_65498504c23738e0c9bac659bac8bb16.bindPopup(popup_7a93d2e0384bd398e9eabb4827c22aa9)
+        ;
+
+        
+    
+    
+            marker_65498504c23738e0c9bac659bac8bb16.bindTooltip(
+                `<div>
+                     HGZ 1 Tapachula - Paracetamol 500mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_65498504c23738e0c9bac659bac8bb16.setIcon(icon_1be3a670b3aae5399e83d4ed4c6114c2);
+            
+    
+            var marker_6396a34beb1d66724000096b57eabccc = L.marker(
+                [21.12, -101.68],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_58e3ed96782ef2e31805e004944c7e84 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_5a3fa63d94d48ca87c14144810a61823 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1792d06aca5444645f49e3f0554213ff = $(`<div id="html_1792d06aca5444645f49e3f0554213ff" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 León</h4>             <b>León, Gto.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Omeprazol 20mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> Meds del Bajío<br>             <b>Precio Unitario:</b> $8.00 MXN<br>             <b>Promedio Mercado:</b> $13.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0405         </div>         </div>`)[0];
+                popup_5a3fa63d94d48ca87c14144810a61823.setContent(html_1792d06aca5444645f49e3f0554213ff);
+            
+        
+
+        marker_6396a34beb1d66724000096b57eabccc.bindPopup(popup_5a3fa63d94d48ca87c14144810a61823)
+        ;
+
+        
+    
+    
+            marker_6396a34beb1d66724000096b57eabccc.bindTooltip(
+                `<div>
+                     HGZ 1 León - Omeprazol 20mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6396a34beb1d66724000096b57eabccc.setIcon(icon_58e3ed96782ef2e31805e004944c7e84);
+            
+    
+            var marker_603e49f004aeb984abf507895dbf7062 = L.marker(
+                [22.15, -100.98],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_a0e02b7268dbe94711eefab30b745f7a = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_6089e809bca14be357bfa1be018bde57 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_87ade4018d7ae1ab480bc6b881a42af9 = $(`<div id="html_87ade4018d7ae1ab480bc6b881a42af9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 San Luis Potosí</h4>             <b>San Luis Potosí, S.L.P.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Omeprazol 20mg<br>             <b>Estatus Abasto:</b> <b style="color: orange;">Atrasado</b><br>             <b>Proveedor:</b> Pharma Potosí<br>             <b>Precio Unitario:</b> $18.00 MXN<br>             <b>Promedio Mercado:</b> $13.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0406         </div>         </div>`)[0];
+                popup_6089e809bca14be357bfa1be018bde57.setContent(html_87ade4018d7ae1ab480bc6b881a42af9);
+            
+        
+
+        marker_603e49f004aeb984abf507895dbf7062.bindPopup(popup_6089e809bca14be357bfa1be018bde57)
+        ;
+
+        
+    
+    
+            marker_603e49f004aeb984abf507895dbf7062.bindTooltip(
+                `<div>
+                     HGZ 1 San Luis Potosí - Omeprazol 20mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_603e49f004aeb984abf507895dbf7062.setIcon(icon_a0e02b7268dbe94711eefab30b745f7a);
+            
+    
+            var marker_6a52962091124c8023c5c6db5b4be12a = L.marker(
+                [24.8, -107.39],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_827f4a9a59a54d7a0135118f904f3bf5 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_2f6634ce97483063ef7530a780dc3079 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_cac3f37cda7e7f23394767cfa483ed8c = $(`<div id="html_cac3f37cda7e7f23394767cfa483ed8c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 Culiacán</h4>             <b>Culiacán, Sin.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Losartán 50mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> Farma Sinaloa<br>             <b>Precio Unitario:</b> $12.00 MXN<br>             <b>Promedio Mercado:</b> $15.67 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0407         </div>         </div>`)[0];
+                popup_2f6634ce97483063ef7530a780dc3079.setContent(html_cac3f37cda7e7f23394767cfa483ed8c);
+            
+        
+
+        marker_6a52962091124c8023c5c6db5b4be12a.bindPopup(popup_2f6634ce97483063ef7530a780dc3079)
+        ;
+
+        
+    
+    
+            marker_6a52962091124c8023c5c6db5b4be12a.bindTooltip(
+                `<div>
+                     HGZ 1 Culiacán - Losartán 50mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_6a52962091124c8023c5c6db5b4be12a.setIcon(icon_827f4a9a59a54d7a0135118f904f3bf5);
+            
+    
+            var marker_47220b7f75126b3450c3d5ec4cfba3aa = L.marker(
+                [20.59, -100.39],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_48505792563e179ac10ceb75ee52852f = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "check-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ec732cd12ddcde800dd1eb62420db2a7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1621545ec9caff5189158f3eb24fcce3 = $(`<div id="html_1621545ec9caff5189158f3eb24fcce3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 Querétaro</h4>             <b>Querétaro, Qro.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Metformina 850mg<br>             <b>Estatus Abasto:</b> <b style="color: green;">A tiempo</b><br>             <b>Proveedor:</b> Distribuidora del Centro<br>             <b>Precio Unitario:</b> $15.00 MXN<br>             <b>Promedio Mercado:</b> $18.50 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0408         </div>         </div>`)[0];
+                popup_ec732cd12ddcde800dd1eb62420db2a7.setContent(html_1621545ec9caff5189158f3eb24fcce3);
+            
+        
+
+        marker_47220b7f75126b3450c3d5ec4cfba3aa.bindPopup(popup_ec732cd12ddcde800dd1eb62420db2a7)
+        ;
+
+        
+    
+    
+            marker_47220b7f75126b3450c3d5ec4cfba3aa.bindTooltip(
+                `<div>
+                     HGZ 1 Querétaro - Metformina 850mg
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_47220b7f75126b3450c3d5ec4cfba3aa.setIcon(icon_48505792563e179ac10ceb75ee52852f);
+            
+    
+            var marker_20771834f43d8035e5e00661fd76c42c = L.marker(
+                [19.7, -101.19],
+                {
+}
+            ).addTo(feature_group_3ab87aba1681c36276755c03dcc6b2eb);
+        
+    
+            var icon_ed5b8be23972a22b9ea2ce3cd2b8d51b = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_24715bbcb6eb7d4cae648a7e3472e4b5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_20d4d1ba73c1ea5a072d12a9a26faa40 = $(`<div id="html_20d4d1ba73c1ea5a072d12a9a26faa40" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 12px; width: 260px;">             <h4 style="margin: 0 0 5px 0;">HGZ 1 Morelia</h4>             <b>Morelia, Mich.</b><hr style="margin: 5px 0;">             <b>Medicamento:</b> Insulina Humana NPH<br>             <b>Estatus Abasto:</b> <b style="color: red;">Crítico / Faltante</b><br>             <b>Proveedor:</b> Meds Michoacán<br>             <b>Precio Unitario:</b> $280.00 MXN<br>             <b>Promedio Mercado:</b> $240.00 MXN<br>             <b>Contrato ID:</b> IMSS-2026-0409         </div>         </div>`)[0];
+                popup_24715bbcb6eb7d4cae648a7e3472e4b5.setContent(html_20d4d1ba73c1ea5a072d12a9a26faa40);
+            
+        
+
+        marker_20771834f43d8035e5e00661fd76c42c.bindPopup(popup_24715bbcb6eb7d4cae648a7e3472e4b5)
+        ;
+
+        
+    
+    
+            marker_20771834f43d8035e5e00661fd76c42c.bindTooltip(
+                `<div>
+                     HGZ 1 Morelia - Insulina Humana NPH
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_20771834f43d8035e5e00661fd76c42c.setIcon(icon_ed5b8be23972a22b9ea2ce3cd2b8d51b);
+            
+    
+            feature_group_3ab87aba1681c36276755c03dcc6b2eb.addTo(map_1b982d7be72268df900733a6c2fa1196);
+        
+</script>
+</html>
